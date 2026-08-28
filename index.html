@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bitfact — Dashboard Financiar">
+  <title>Bitfact — Dashboard Financiar</title>
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('bitfact_theme') || 'light');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-name">Bitfact</span>
+      </div>
+      <nav class="nav" aria-label="Meniu principal">
+        <a href="#overview" class="nav-link active" data-tab="overview" id="nav-overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Sinteza</span>
+        </a>
+        <a href="#portfolio" class="nav-link" data-tab="portfolio" id="nav-portfolio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Portofoliu</span>
+        </a>
+        <a href="#aging" class="nav-link" data-tab="aging" id="nav-aging">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Creante</span>
+        </a>
+        <a href="#clients" class="nav-link" data-tab="clients" id="nav-clients">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Clienti</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <!-- Top header bar -->
+      <header class="top-bar">
+        <h1 class="page-title" id="page-heading">Sinteza Financiara</h1>
+
+        <div class="actions">
+          <button id="btn-theme" class="btn btn-ghost btn-icon" title="Comuta tema (T)" aria-label="Comuta tema">
+            <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+
+          <input type="file" id="file-import" accept=".csv, .json" style="display: none;">
+          <button id="btn-import-trigger" class="btn btn-ghost">Import</button>
+          <button id="btn-print" class="btn btn-ghost">Tipareste</button>
+          <button id="btn-export-csv" class="btn btn-ghost">Export CSV</button>
+          <button id="btn-add-contract" class="btn btn-primary">+ Contract Nou</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- Overview tab -->
+        <section id="tab-overview" class="tab-panel active">
+          <!-- KPI cards -->
+          <div class="kpi-grid">
+            <div class="card kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Total</span>
+                <span class="badge-neutral mono" id="kpi-contract-count">-</span>
+              </div>
+              <div class="kpi-number mono" id="kpi-total-contracted">-</div>
+            </div>
+
+            <div class="card kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Incasat efectiv</span>
+                <span class="badge-positive mono" id="kpi-collection-rate">-</span>
+              </div>
+              <div class="kpi-number mono" id="kpi-total-collected">-</div>
+            </div>
+
+            <div class="card kpi-card kpi-risk">
+              <div class="kpi-header">
+                <span class="kpi-label text-brick">Total restante</span>
+                <span class="badge-risk mono" id="kpi-overdue-count">-</span>
+              </div>
+              <div class="kpi-number mono text-brick" id="kpi-total-overdue">-</div>
+            </div>
+          </div>
+
+          <!-- Cashflow and aging breakdown -->
+          <div class="analytics-grid">
+            <div class="card analytics-card">
+              <div class="card-header">
+                <h3 class="card-title">Flux de numerar</h3>
+              </div>
+              <div class="card-body">
+                <div class="flux-bar">
+                  <div class="flux-seg settled" id="meter-collected" style="width: 0%"></div>
+                  <div class="flux-seg pending" id="meter-pending" style="width: 0%"></div>
+                  <div class="flux-seg flagged" id="meter-overdue" style="width: 0%"></div>
+                </div>
+
+                <div class="flux-legend">
+                  <div class="flux-item">
+                    <span class="flux-dot settled"></span>
+                    <span class="flux-label">Incasat</span>
+                    <span class="flux-val mono" id="legend-collected-val">-</span>
+                  </div>
+                  <div class="flux-item">
+                    <span class="flux-dot pending"></span>
+                    <span class="flux-label">La termen</span>
+                    <span class="flux-val mono" id="legend-pending-val">-</span>
+                  </div>
+                  <div class="flux-item">
+                    <span class="flux-dot flagged"></span>
+                    <span class="flux-label text-brick">Restant</span>
+                    <span class="flux-val mono text-brick" id="legend-overdue-val">-</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card analytics-card">
+              <div class="card-header">
+                <h3 class="card-title">Scadentar creante</h3>
+                <span class="badge-risk mono" id="critical-insight-badge">2 critice</span>
+              </div>
+              <div class="card-body no-pad">
+                <div class="aging-list" id="overview-aging-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contracts table -->
+          <div class="card table-card">
+            <div class="toolbar">
+              <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="overview-search" class="search-input" placeholder="Cauta dupa client, contract, CUI...">
+                <button class="search-clear-btn" id="btn-clear-overview-search" aria-label="Sterge cautarea">✕</button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="clean-table">
+                <thead>
+                  <tr>
+                    <th class="sortable col-client" data-sort="company_name">Client <span class="sort-arrow">&#8597;</span></th>
+                    <th class="sortable text-right col-total" data-sort="total_value_eur">Valoare <span class="sort-arrow">&#8597;</span></th>
+                    <th class="sortable text-right col-overdue" data-sort="overdue_amount">Restant <span class="sort-arrow">&#8597;</span></th>
+                    <th class="sortable col-status" data-sort="status">Status <span class="sort-arrow">&#8597;</span></th>
+                    <th class="text-right col-actions">Actiuni</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-table-body"></tbody>
+              </table>
+            </div>
+
+            <div class="table-footer">
+              <span class="table-tally mono" id="overview-table-tally">-</span>
+              <div class="pagination" id="overview-pagination"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Portfolio tab -->
+        <section id="tab-portfolio" class="tab-panel">
+          <div class="card table-card">
+            <div class="toolbar">
+              <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="portfolio-search" class="search-input" placeholder="Cauta dupa client, cod, industrie, CUI...">
+                <button class="search-clear-btn" id="btn-clear-portfolio-search" aria-label="Sterge cautarea">✕</button>
+              </div>
+
+              <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">Toate</button>
+                <button class="filter-btn" data-filter="active">Active</button>
+                <button class="filter-btn" data-filter="overdue">Restante</button>
+                <button class="filter-btn" data-filter="completed">Finalizate</button>
+                <button class="filter-btn" data-filter="cancelled">Anulate</button>
+              </div>
+
+              <select id="portfolio-industry" class="industry-select" aria-label="Filtru Industrie">
+                <option value="all">Toate industriile</option>
+              </select>
+            </div>
+
+            <div class="table-wrap">
+              <table class="clean-table">
+                <thead>
+                  <tr>
+                    <th class="sortable col-client" data-sort="company_name">Client <span class="sort-arrow">&#8597;</span></th>
+                    <th class="sortable text-right col-total" data-sort="total_value_eur">Valoare <span class="sort-arrow">&#8597;</span></th>
+                    <th class="sortable text-right col-overdue" data-sort="overdue_amount">Restant <span class="sort-arrow">&#8597;</span></th>
+                    <th class="sortable col-status" data-sort="status">Status <span class="sort-arrow">&#8597;</span></th>
+                    <th class="text-right col-actions">Actiuni</th>
+                  </tr>
+                </thead>
+                <tbody id="portfolio-table-body"></tbody>
+              </table>
+            </div>
+
+            <div class="table-footer">
+              <span class="table-tally mono" id="portfolio-table-tally">-</span>
+              <button id="btn-export-filtered" class="btn btn-ghost">Export CSV</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Receivables aging tab -->
+        <section id="tab-aging" class="tab-panel">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Scadentar creante & Protocol de colectare</h3>
+            </div>
+            <div class="card-body grid-two-col">
+              <div class="aging-list" id="deep-aging-list"></div>
+              
+              <div class="policy-box">
+                <h4 class="policy-heading">Protocol Recuperare</h4>
+                <ul class="policy-list">
+                  <li><strong>1–30 zile:</strong> Notificare electronica de scadenta.</li>
+                  <li><strong>31–60 zile:</strong> Contactare directa departament financiar.</li>
+                  <li><strong>Peste 60 zile:</strong> Somatie de plata si blocare livrabile.</li>
+                </ul>
+                <div class="policy-total">
+                  <span class="policy-label">Sold total la risc</span>
+                  <span class="mono policy-val text-brick" id="deep-aging-total-risk">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Top clients tab -->
+        <section id="tab-clients" class="tab-panel">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Top clienti dupa cifra contractata</h3>
+            </div>
+            <div class="card-body no-pad">
+              <div class="table-wrap">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 50px;">#</th>
+                      <th>Client</th>
+                      <th class="text-right">Valoare Contractata</th>
+                      <th class="text-right">Pondere %</th>
+                      <th style="width: 160px;">Distributie</th>
+                    </tr>
+                  </thead>
+                  <tbody id="client-share-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/edit contract modal -->
+  <div class="modal-overlay" id="contract-modal" aria-hidden="true" role="dialog">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Contract Nou</h3>
+        <button id="btn-close-modal" class="modal-close-btn" aria-label="Inchide">&#10005;</button>
+      </div>
+      <form id="contract-form">
+        <div class="modal-body">
+          <input type="hidden" id="contract-id" value="">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="company_name">Client *</label>
+              <input type="text" id="company_name" required placeholder="SC Alpha Logistics SRL">
+            </div>
+            <div class="form-field">
+              <label for="fiscal_code">Cod Fiscal / CUI</label>
+              <input type="text" id="fiscal_code" placeholder="RO39281920">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="contract_code">Cod Contract *</label>
+              <input type="text" id="contract_code" required placeholder="CTR-2026-025">
+            </div>
+            <div class="form-field">
+              <label for="industry">Industrie *</label>
+              <input type="text" id="industry" required placeholder="IT, Logistica, Energie">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="total_value">Valoare Totala (€) *</label>
+              <input type="number" id="total_value" step="1" min="1" required placeholder="45000">
+            </div>
+            <div class="form-field">
+              <label for="collected_amount">Incasat (€)</label>
+              <input type="number" id="collected_amount" step="1" min="0" value="0" placeholder="15000">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="overdue_amount">Restant (€)</label>
+              <input type="number" id="overdue_amount" step="1" min="0" value="0" placeholder="0">
+            </div>
+            <div class="form-field">
+              <label for="due_date">Scadenta Restanta</label>
+              <input type="date" id="due_date">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="contract_status">Status Contract</label>
+              <select id="contract_status">
+                <option value="active">Activ</option>
+                <option value="completed">Finalizat</option>
+                <option value="cancelled">Anulat</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel" class="btn btn-ghost">Anuleaza</button>
+          <button type="submit" id="btn-submit" class="btn btn-primary">Salveaza Contractul</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contract details drawer -->
+  <div class="drawer-overlay" id="detail-drawer" aria-hidden="true">
+    <div class="drawer">
+      <div class="drawer-header">
+        <div>
+          <h3 class="drawer-title" id="drawer-company">-</h3>
+          <span class="mono drawer-code" id="drawer-code">-</span>
+        </div>
+        <button id="btn-close-drawer" class="modal-close-btn" aria-label="Inchide">&#10005;</button>
+      </div>
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <div class="drawer-section-title">Profil Client</div>
+          <div class="drawer-grid">
+            <div><span class="drawer-label">Industrie</span><div class="drawer-value" id="drawer-industry">-</div></div>
+            <div><span class="drawer-label">CUI / CIF</span><div class="drawer-value mono" id="drawer-cui">-</div></div>
+            <div><span class="drawer-label">Status</span><div class="drawer-value" id="drawer-status">-</div></div>
+            <div><span class="drawer-label">Rata Recuperare</span><div class="drawer-value mono" id="drawer-rate">-</div></div>
+          </div>
+        </div>
+        <div class="drawer-section">
+          <div class="drawer-section-title">Bilant Financiar</div>
+          <div class="drawer-grid">
+            <div><span class="drawer-label">Valoare Contract</span><div class="drawer-value mono" id="drawer-total">-</div></div>
+            <div><span class="drawer-label">Incasat Efectiv</span><div class="drawer-value mono" id="drawer-collected">-</div></div>
+            <div><span class="drawer-label">Sold Neincasat</span><div class="drawer-value mono" id="drawer-pending">-</div></div>
+            <div><span class="drawer-label">Sold Restant</span><div class="drawer-value mono text-brick" id="drawer-overdue">-</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notifications container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
